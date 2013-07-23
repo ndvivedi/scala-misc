@@ -10,7 +10,7 @@ object UBTree {
     override def insert(e: A)(implicit o: Ordering[A]): UBTree[A] = Node[A](e, Empty(), Empty())
     override def remove(e: A)(implicit o: Ordering[A]): UBTree[A] = this
   }
-  case class Node[A](e: A, left: UBTree[A], right: Tree[A]) extends Tree[A] {
+  case class Node[A](e: A, left: UBTree[A], right: UBTree[A]) extends UBTree[A] {
     override def contains(v: A)(implicit o: Ordering[A]): Boolean =  o.compare(e, v) match {
       case 0 => true
       case -1 => right.contains(v)
@@ -30,5 +30,10 @@ object UBTree {
       case -1 => Node[A](e, left, right.remove(v))
       case 1 => Node[A](e, left.remove(v), right)
     }
+  }
+
+  def traverse[A](t: UBTree[A]): Seq[A] = t match {
+    case Empty() => List()
+    case Node(x, l, r) => traverse(l) ++ List(x) ++ traverse(r)
   }
 }

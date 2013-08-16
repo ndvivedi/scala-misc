@@ -1,14 +1,14 @@
 object Trie {
   import scala.collection._
 
-  def apply[A <% Ordered[A]](items: List[List[A]]) = 
+  def apply[A](items: List[List[A]]) = 
     items.foldRight(empty[A])((i:List[A],t:Trie[A]) => t.addItem(i))
-  def empty[A <% Ordered[A]] = Trie(immutable.TreeMap[A, Trie[A]](), false)
+  def empty[A] = Trie(immutable.Map[A, Trie[A]](), false)
 
-  case class Trie[A <% Ordered[A]](next: immutable.TreeMap[A, Trie[A]], end: Boolean) {
+  case class Trie[A](next: immutable.Map[A, Trie[A]], end: Boolean) {
     def addItem(item: List[A]): Trie[A] = item match {
       case Nil => Trie[A](next, true)
-      case h::t => Trie[A](next + (h -> next.getOrElse(h, empty[A]).addItem(t)), end)
+      case h::t => Trie[A](next + (h -> next.getOrElse(h, empty).addItem(t)), end)
     }
 
     def full(item: List[A]): Boolean = 

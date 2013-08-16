@@ -2,7 +2,7 @@ object Trie {
   import scala.collection._
 
   def apply[A](items: List[List[A]]) = 
-    items.foldRight(empty[A])((i:List[A],t:Trie[A]) => t.addItem(i))
+    items.foldLeft(empty[A])((t:Trie[A],i:List[A]) => t.addItem(i))
   def empty[A] = Trie(immutable.Map[A, Trie[A]](), false)
 
   case class Trie[A](next: immutable.Map[A, Trie[A]], end: Boolean) {

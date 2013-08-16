@@ -3,6 +3,18 @@ import scala.collection._
 object Board {
   def apply(b: Vector[Vector[Char]]) = new Board(b)
 
+  //val words = wordsFrom(board)
+
+  val dictWords = List("the", "tot", "his", "the", "to", "this", "fuck", "face")
+  def getWords = { 
+    import scala.io._
+    val f = Source.fromFile("/usr/share/dict/words")
+    f.getLines().map(_.toLowerCase()).toList
+  }
+  val dict = Trie(getWords.map(_.toList))
+
+
+
   class Board(val board: Vector[Vector[Char]]) {
     val ymax = board(0).length - 1
     val xmax = board.length - 1
@@ -21,9 +33,6 @@ object Board {
     //val words = wordsFrom(board)
     lazy val words = trav
 
-    val dictWords = List("the", "his", "the", "to", "this", "fuck", "face")
-    val dict = Trie(dictWords.map(_.toList))
-
     def trav(): List[String] = {
 
       def t00(ns: List[Node], path: List[Node], accum: List[String]): List[String] = {
@@ -35,19 +44,20 @@ object Board {
       def t0(n: Node, path: List[Node], accum: List[String]): List[String] = {
         val currentPath = path :+ n
         val currentWord = currentPath.map(_.char)
+        //only look at neighbors that we haven't already come across
+        val filteredNeighbors = n.neighbors.filter(!path.contains(_))
         if (dict.prefix(currentWord)) {
           if (dict.full(currentWord)) { 
-            currentWord.mkString("") :: t00(n.neighbors, currentPath, accum) 
+            currentWord.mkString("") :: t00(filteredNeighbors, currentPath, accum) 
           }
           else {
-            t00(n.neighbors, currentPath, accum)
+            t00(filteredNeighbors, currentPath, accum)
           }
         }
         else accum
       }
 
       (for (i <- 0 to xmax; j <- 0 to ymax) yield t0(nodeFor(i, j), List[Node](), List[String]())).flatten.toList
-      //t0(nodeFor(0, 0), List[Node](), List[String]())
     }
 
     def containsWord(word: String): Boolean = words contains word

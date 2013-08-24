@@ -44,4 +44,13 @@ object Maybe {
       case a :: t => map2(f(a), traverse(t, f), (hh:B, tt:List[B]) => (hh::tt))
     }
   }
+
+  def traverse2[A, B](as: List[A])(f: A => Maybe[B]): Maybe[List[B]] = 
+    as.foldRight(Some(List[B]()).asInstanceOf[Maybe[List[B]]]) { (a, accum) =>
+      (f(a), accum) match {
+        case (Some(b), Some(bs)) => Some(b :: bs)
+        case _ => None()
+      }
+    }
+
 }

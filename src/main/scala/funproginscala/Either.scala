@@ -34,7 +34,4 @@ object Either2 {
   def sequence[E, A](as: List[Either[E, A]]): Either[E, List[A]] = 
     traverse(as, (x:Either[E,A]) => x)
 
-
-
-
 }

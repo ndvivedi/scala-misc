@@ -39,19 +39,19 @@ object Shortest {
       def visitedByEdge(e:Edge): Boolean = !(visited.contains(e.v1) && visited.contains(e.v2))
       val newPaths = (
         for (path <- paths;
-             nextEdge <- out(path.first) filter visitedByEdge) 
+             nextEdge <- out(path.head) filter visitedByEdge) 
            yield nextEdge :: path);
-      val newVisited = visited ++ newPaths.map(p => List(p.first.v1, p.first.v2)).flatten
+      val newVisited = visited ++ newPaths.map(p => List(p.head.v1, p.head.v2)).flatten
 
       if (newVisited.size == visited.size)
         //If we haven't visted any new nodes we are done without finding a path
         List()
       else
-        newPaths.filter((p: Path) => p.first.contains(end)) match {
+        newPaths.filter((p: Path) => p.head.contains(end)) match {
           case Nil => trav0(newPaths, newVisited);
           case x::_ => x;
         }
     }
-    trav0(edges(start).map(x => List(x)), Set[Vertex]())
+    trav0(edges(start).map(List(_)), Set[Vertex]())
   }
 }

@@ -4,6 +4,13 @@ object Main extends App {
 
   def small(): (List[Edge], List[Vertex]) = {
     val verts = (for (i <- 0 until 5) yield new Vertex(i.toString)).toList
+/*
+  0 -- 1
+    \- 2 - 4
+    \- 3 - 4
+
+ */
+
     val graph = List(
         new Edge(verts(0), verts(1)),
         new Edge(verts(0), verts(2)),

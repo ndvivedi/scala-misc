@@ -21,4 +21,5 @@ object Game {
       leadersWithScores sortBy (-_._2)
     }
   }
+
 }

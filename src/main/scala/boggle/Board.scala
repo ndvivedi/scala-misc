@@ -1,7 +1,7 @@
 import scala.collection._
 
 object Board {
-  def apply(b: Vector[Vector[Char]]) = new Board(b)
+  def apply(b: IndexedSeq[IndexedSeq[Char]]) = new Board(b)
 
   //val words = wordsFrom(board)
 
@@ -15,32 +15,34 @@ object Board {
 
 
 
-  class Board(val board: Vector[Vector[Char]]) {
+  class Board(val board: IndexedSeq[IndexedSeq[Char]]) {
     val ymax = board(0).length - 1
     val xmax = board.length - 1
+    
 
     case class Node(x: Int, y: Int, c: Char) {
       def char = board(x)(y)
       def neighbors(): List[Node] = {
         val moves = List(-1, 0, 1)
-        (for (xx <- moves; yy <- moves) yield (xx + x, yy + y)).filter { case (a,b) => ! ((a < 0) || (a > xmax) || (b < 0) || (b > ymax) || ((a ==
-        x && b == y))) } map
-        { case (aa,bb) => Node(aa,bb,board(aa)(bb)) }
+        val neighborCoords = moves flatMap { a => moves map { b => (a, b) } } filter { case (a,b) => boardContains(a, b) &&  (a,b) != (x,y) }
+        //(for (xx <- moves; yy <- moves) yield (xx + x, yy + y)).filter { case (a,b) => ! ((a < 0) || (a > xmax) || (b < 0) || (b > ymax) || ((a ==
+        //x && b == y))) } map
+        neighborCoords map { case (aa,bb) => Node(aa,bb,board(aa)(bb)) }
       }
     }
 
     def nodeFor(x: Int, y: Int): Node = Node(x, y, board(x)(y))
-    //val words = wordsFrom(board)
+    def boardContains(x: Int, y: Int): Boolean = (x >= 0 && x <= xmax && y >= 0 && y <= ymax)
+  
     lazy val words = trav
 
     def trav(): List[String] = {
 
-      def t00(ns: List[Node], path: List[Node], accum: List[String]): List[String] = {
-        ns match {
-          case Nil => accum
-          case h::t => t00(t, path, t0(h, path, accum))
-        }
+      def t00(ns: List[Node], path: List[Node], accum: List[String]): List[String] =      ns match {
+        case Nil => accum
+        case h::t => t00(t, path, t0(h, path, accum))
       }
+      
       def t0(n: Node, path: List[Node], accum: List[String]): List[String] = {
         val currentPath = path :+ n
         val currentWord = currentPath.map(_.char)
@@ -61,6 +63,13 @@ object Board {
     }
 
     def containsWord(word: String): Boolean = words contains word
+  }
+
+
+  def generateRandomBoard(x: Int, y: Int): Board = {
+    val r = new scala.util.Random
+    val grid = 0 to x map {_ => 0 to y map { _ => (97 + r.nextInt(26)).toChar}}
+    Board(grid)
   }
 
 

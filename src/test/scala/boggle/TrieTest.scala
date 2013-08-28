@@ -13,7 +13,6 @@ object TrieTests extends Properties("Trie") {
       outTrie <- Arbitrary.arbitrary[List[List[Char]]] suchThat (l => (l.length > 0 && l.forall(! inTrie.contains(_))))
     } yield (Trie(inTrie), inTrie, outTrie)
 
-
   property("all in") = forAll (genTrie) {
     case (trie, inTrie, _) =>
       inTrie.forall(trie.full(_))
@@ -30,6 +29,13 @@ object TrieTests extends Properties("Trie") {
         val prefixes = (1 to word.length) map { word.take(_) }
         prefixes.forall(trie.prefix(_))
       }
+  }
+
+  property("check that prefixes not in trie are not reported") = forAll (genTrie) {
+    case (trie, inTrie, outTrie) =>
+      val inPrefix = inTrie flatMap { w => (1 until w.length) map { w.take(_) } } toSet
+      val outPrefix = outTrie flatMap { w => (1 until w.length) map { w.take(_) } }
+      outPrefix filter { ! inPrefix.contains(_) } forall { ! trie.prefix(_) }
   }
 
 }
